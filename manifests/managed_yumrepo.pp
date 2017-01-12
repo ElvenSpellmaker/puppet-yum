@@ -1,6 +1,7 @@
 # = Define yum::managed_yumrepo
 #
 define yum::managed_yumrepo (
+  $repo_name       = undef,
   $descr           = 'absent',
   $baseurl         = 'absent',
   $mirrorlist      = 'absent',
@@ -25,6 +26,11 @@ define yum::managed_yumrepo (
 
   # ensure that everything is setup
   include yum::prerequisites
+
+  $real_repo_name = $repo_name ? {
+    undef   => $title,
+    default => $repo_name,
+  }
 
   if $protect != 'absent' {
     if ! defined(Yum::Plugin['protectbase']) {
@@ -60,6 +66,7 @@ define yum::managed_yumrepo (
     }
   }
   yumrepo { $name:
+    name            => $real_repo_name,
     descr           => $descr,
     baseurl         => $baseurl,
     mirrorlist      => $mirrorlist,
